@@ -6,6 +6,8 @@
 
 var Botkit = require('botkit/lib/Botkit.js')
 request = require('request');
+coffee = require('coffee-script');
+require('coffee-script/register');
 
 controller = Botkit.slackbot({
   debug: false,
@@ -19,10 +21,8 @@ bot = controller.spawn(
 
 MENTIONS = 'direct_message,direct_mention,mention';
 AMBIENT = 'ambient';
+ALL = 'message_received';
 
-
-require('coffee-script');
-require('coffee-script/register');
 
 // file is included here:
 (function() {
