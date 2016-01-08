@@ -5,6 +5,17 @@ WEATHER_API_KEY = process.env.weather_api_key
 
 # use 'Weather Underground' API
 # place like 'Japan/Kyoto'
+getHourlyWeather = (place, callback) ->
+  url = "#{WEATHER_API}/#{WEATHER_API_KEY}/hourly/q/#{place}.json"
+  console.log "getWeatherForcast : '#{url}'"
+  request.get {url: url}, (err, r, body) ->
+    if err
+      console.dir err
+    else
+      callback(JSON.parse(body))
+
+# use 'Weather Underground' API
+# place like 'Japan/Kyoto'
 getWeatherForcast = (place, callback) ->
   url = "#{WEATHER_API}/#{WEATHER_API_KEY}/forecast/q/#{place}.json"
   console.log "getWeatherForcast : '#{url}'"
@@ -69,8 +80,47 @@ weatherReport = (cb) ->
   catch ex
     console.dir ex
 
+hourlyWeather = (cb) ->
+  try
+    getHourlyWeather 'Japan/Kyoto', (res) ->
+      limit = new Date().getTime() + (24*60*60*1000)
+      startHour = res.hourly_forecast[0]['FCTTIME'].hour
+      weathers = []
+      for w in res.hourly_forecast
+        spentHours = w['FCTTIME'].hour - startHour
+        time = new Date(w['FCTTIME'].epoch * 1000)
+        if spentHours % 3 == 0 && time.getTime() < limit
+          data = {
+            temp: w.temp.metric,
+            cond: w.condition,
+            pop: w.pop,
+            icon: weatherIcon(w.icon),
+            time: time,
+          }
+          weathers.push formatWeather(data)
+      cb "今日の天気は... \n" + weathers.join("\n")
+  catch ex
+    console.dir ex
+
+formatWeather = (w) ->
+  msg = []
+  if w.time.getHours() == 0
+    msg.push "#{w.time.getMonth()+1}/#{w.time.getDate()} (#{dayOfWeek w.time})\n"
+  msg.push w.time.getHours()
+  msg.push w.icon
+  msg.push "#{w.temp}℃  / #{w.pop}%"
+  msg.join " "
+
+DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+dayOfWeek = (date) ->
+  DAYS_OF_WEEK[date.getDay()]
+
 # weather news
-controller.hears ['weahter', '天気'], MENTIONS, (bot, message) ->
+controller.hears ['明日の天気'], MENTIONS, (bot, message) ->
   weatherReport (report) ->
+    bot.reply message, report
+
+controller.hears ['今日の天気'], MENTIONS, (bot, message) ->
+  hourlyWeather (report) ->
     bot.reply message, report
 
