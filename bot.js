@@ -23,6 +23,7 @@ MENTIONS = 'direct_message,direct_mention,mention';
 AMBIENT = 'ambient';
 ALL = 'message_received';
 
+shutup = false;
 
 // file is included here:
 (function() {
