@@ -14,6 +14,9 @@ controller.hears ['ぬるぽ$'], AMBIENT, (bot, message) ->
 controller.hears ['ぬるぽん'], AMBIENT, (bot, message) ->
   bot.reply message, "ん？"
 
+controller.hears ['元気[？?]'], MENTIONS, (bot, message) ->
+  bot.reply message, "元気だけど"
+
 controller.hears ['いえ[ぃい]'], AMBIENT, (bot, message) ->
   params =
     timestamp: message.ts,

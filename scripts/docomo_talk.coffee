@@ -5,12 +5,14 @@ DOCOMO_API_KEY = process.env.DOCOMO_API_KEY
 DocomoAPI = require('docomo-api')
 api = new DocomoAPI(DOCOMO_API_KEY)
 
-controller.hears ['.*'], MENTIONS, (bot, message) ->
+# delayed response queue
+controller.delayed_hears ['.*'], MENTIONS, (bot, message) ->
   if !DOCOMO_API_KEY
     console.log "DOCOMO_API_KEY is missing"
     return
 
   msg = message.text
+  console.log "docomo-talk: #{msg}"
   return if shutup || !msg
 
   bot.api.users.info {user: message.user}, (err, res) ->
